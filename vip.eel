@@ -1,0 +1,19 @@
+// a small hax to select the track with fx parameters touched last - made for AKAI ADVANCE + VIP software
+
+function updateVIP()
+(
+  prj = SelectProjectInstance(EnumProjects(-1, NULL));
+  last_fx_track_idx = -1;
+  last_fx_idx = -1;
+  last_fx_val = -1;
+  last_fx_isValid = GetLastTouchedFX(last_fx_track_idx, last_fx_idx, last_fx_val);
+  last_fx_isValid ? (
+    last_fx_track = GetTrack(prj, last_fx_track_idx-1);
+    SetOnlyTrackSelected(last_fx_track);
+    // todo, keep track of all track with VIP instances, and do this select/unselec only on those
+  );
+  defer("updateVIP()");
+);
+
+updateVIP();
+
