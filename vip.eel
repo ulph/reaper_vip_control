@@ -30,7 +30,7 @@ function updateVIP()
             valid_transition ? (
               SetAutomationMode(0, 0);
               SetOnlyTrackSelected(last_fx_track);
-              SetAutomationMode(1, 1);
+              SetAutomationMode(4, 1);
             );
           );
         );
