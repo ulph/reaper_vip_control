@@ -1,19 +1,44 @@
 // a small hax to select the track with fx parameters touched last - made for AKAI ADVANCE + VIP software
+    
+prj = SelectProjectInstance(EnumProjects(-1, NULL));
+time_last_action = time_precise();
+last_selected_track = GetSelectedTrack(prj, 0);
 
 function updateVIP()
 (
-  prj = SelectProjectInstance(EnumProjects(-1, NULL));
-  last_fx_track_idx = -1;
-  last_fx_idx = -1;
-  last_fx_val = -1;
-  last_fx_isValid = GetLastTouchedFX(last_fx_track_idx, last_fx_idx, last_fx_val);
-  last_fx_isValid ? (
-    last_fx_track = GetTrack(prj, last_fx_track_idx-1);
-    SetOnlyTrackSelected(last_fx_track);
-    // todo, keep track of all track with VIP instances, and do this select/unselec only on those
+  time_now = time_precise();
+  time_now - time_last_action > 1 ? (
+    time_last_action = time_now;
+    prj = SelectProjectInstance(EnumProjects(-1, NULL));
+    selected_track = GetSelectedTrack(prj, 0);
+    GetLastTouchedFX(last_fx_track_idx, last_fx_idx, last_fx_val) ? (
+      last_fx_track = GetTrack(prj, last_fx_track_idx-1);
+      selected_track != last_fx_track ? (
+        TrackFX_GetFXName(last_fx_track, last_fx_idx, #last_fx_name) ? (
+          match("* VIP *", #last_fx_name) ? (
+            selected_track_num_fx = TrackFX_GetCount(selected_track);
+            valid_transition = 0;
+            tmp_i = 0;
+            loop(selected_track_num_fx,
+              TrackFX_GetFXName(selected_track, tmp_i, #tmp_fx_name) ? (
+                match("* VIP *", #tmp_fx_name) ? (
+                  valid_transition = 1;
+                );
+              );
+              tmp_i += 1;
+            );
+            valid_transition ? (
+              SetAutomationMode(0, 0);
+              SetOnlyTrackSelected(last_fx_track);
+              SetAutomationMode(1, 1);
+            );
+          );
+        );
+      );
+    );
   );
   defer("updateVIP()");
 );
-
+ 
 updateVIP();
 
